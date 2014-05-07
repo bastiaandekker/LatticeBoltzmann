@@ -1,0 +1,6 @@
+50         gridpoints in x-direction
+25          y-direction
+4000     timesteps
+8d-1      tau
+0.001       deltaV
+.true.      Should an obstacle be placed in the pipe?
