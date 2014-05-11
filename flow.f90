@@ -23,10 +23,11 @@ program Flow
     ! Initialize all variables. Get parameter values from flow.params
     call Initialize()
     
-    ! Perform lb simulation
+    ! Perform lb simulation and plot.
     do t = 0, timeSteps
         call MoveDensities(dens)
         call ApplyBC(dens, boundaries)
+        call GetSumDensAndVel(sumDens, averVel, dens)
         call ApplyForce(dens, deltaV)
         call GetSumDensAndVel(sumDens, averVel, dens)
         call GetEqDens(eqDens, sumDens, averVel)
@@ -62,7 +63,7 @@ subroutine Initialize
     sumDens=1.d0
     call GetEqDens(dens, sumDens, averVel)! 
 
-    call InitPlot(lX,lY)
+    call InitPlot(lX,lY, 1d0)
 end subroutine Initialize
 
 
