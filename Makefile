@@ -10,7 +10,8 @@ LIBS += $(shell pkg-config --libs plplotd-f95)
 COMPILE = $(FC) $(FFLAGS)
 LINK = $(FC) $(LDFLAGS)
 
-OBJS += helpers.o
+OBJS += flow_helpers.o
+OBJS += flow_plotters.o
 OBJS += flow.o
 
 flow: $(OBJS)

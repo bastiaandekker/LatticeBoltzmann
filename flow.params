@@ -4,3 +4,5 @@
 8d-1      tau
 0.001       deltaV
 .true.      Should an obstacle be placed in the pipe?
+100        Number of iterations in between the plotting    
+.true.  PauzeAfterPlotting
