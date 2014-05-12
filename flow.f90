@@ -27,16 +27,20 @@ program Flow
     do t = 0, timeSteps
         call MoveDensities(dens)
         call ApplyBC(dens, boundaries)
-        call GetSumDensAndVel(sumDens, averVel, dens)
         call ApplyForce(dens, deltaV)
         call GetSumDensAndVel(sumDens, averVel, dens)
         call GetEqDens(eqDens, sumDens, averVel)
         call RelaxDensities(dens, tau, eqDens)
+!print *, averVel(3,15,:)
+!print *, sumDens(3,15)
+!print *, 'dens'
+!print *, dens(3,15,:)
         call DoPlotting(t, pauzeAfterPlotting, averVel)
+        
     end do
     
-    ! Save and plot final results   
-    call PrintWriteResults
+    ! Save final results
+    call PrintWriteResults(averVel)
 contains
 
 ! **********************************************************************************
@@ -134,11 +138,11 @@ subroutine GetSumDensAndVel(sumDens, averVel, inputDens)
     
     ! Get average velocity
     sumDens = sum(inputDens(:,:,:), dim=3)
-    
     forall (x = 1:lX, y = 1:lY, i = 1:dimensions)
            averVel(x,y,i) = dble(sum(d2Q9Vec(:,i)*inputDens(x,y,:)))/sumDens(x,y)
     end forall
     
+    ! Check for devision by zero
     if (ANY(sumDens(:,:) .eq. 0.d0)) print *, 'error: devision by zero'
 end subroutine
 
@@ -190,10 +194,23 @@ subroutine DoPlotting(t, pauzeAfterPlotting, averVel)
 end subroutine DoPlotting
  
 ! **********************************************************************************
-subroutine PrintWriteResults()
+subroutine PrintWriteResults(averVel)
+    real(8), intent(inout) :: averVel(:,:,:)
+    integer             :: i
+    
+    ! Close the PLplotting
     call ClosePlot()
+    
+    ! Save the average velocity profile at the entrence of the system
+    call GetSumDensAndVel(sumDens, averVel, dens)   
+    open(15, file='profile.txt')
+    do i = 1, size(averVel(:,:,:), 2)
+            write (15, *) averVel(1,i,1)
+    end do
+    close(15)
+    print *, 'Veloctity profile saved in profile.txt'
+    write(*,*)
 end subroutine PrintWriteResults
-
 
 end program Flow
 ! **********************************************************************************
