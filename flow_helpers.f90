@@ -11,10 +11,11 @@ contains
 ! **********************************************************************************   
 ! Reads 'flow.params'
 subroutine GetParameters(lX, lY, tau, timeSteps, deltaV, useObstacle, &
-                        numItPerFrame, pausePlotting)
+                        numItPerFrame, pausePlotting, usePlShades)
     real(8), intent(out) :: tau, deltaV
     integer, intent(out) :: lX, lY, timeSteps, numItPerFrame
-    logical, intent(out) :: useObstacle, pausePlotting
+    logical, intent(out) :: useObstacle, pausePlotting, usePlShades
+    
 
     open(12, file="flow.params")
     read(12,*) lX ! Gridpoints in the x-direction (direction of flow)
@@ -25,6 +26,7 @@ subroutine GetParameters(lX, lY, tau, timeSteps, deltaV, useObstacle, &
     read(12,*) useObstacle  ! Should an obstacle be placed in the pipe?
     read(12,*) numItPerFrame  ! Should an obstacle be placed in the pipe?
     read(12,*) pausePlotting  ! Should an obstacle be placed in the pipe?
+    read(12,*) usePlShades  ! Should an obstacle be placed in the pipe?
     close(12)
 end subroutine GetParameters
 

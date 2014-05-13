@@ -24,16 +24,18 @@ end subroutine InitPlot
 
 ! **********************************************************************************
 ! Main plotting routine
-subroutine DrawFlow(lX,lY,averVel, boundaries)
+subroutine DrawFlow(lX,lY,averVel, boundaries, usePlShades)
     real(8), intent(in) :: averVel(:,:,:)
-    logical, intent(in) :: boundaries(:,:)
+    logical, intent(in) :: boundaries(:,:), usePlShades
     integer, intent(in) :: lX,lY
     integer             :: iBoundarySymbol = 9
-    integer             :: x,y
+    integer             :: numShades
+    integer             :: x,y,i
     real(8)             :: maxAverVel
-    character(len=30)       :: title
-    real(kind=plflt) u(lX,lY), v(lX,lY), scaling, xg(lX,lY), yg(lX,lY)
-       
+    character(len=30)   :: title
+    character(len=1) dummy
+    real(kind=plflt) u(lX,lY), v(lX,lY), w(lX,lY) , scaling, xg(lX,lY), yg(lX,lY), shades(50)
+    numShades = size(shades)
     
     call plclear()
     
@@ -49,7 +51,7 @@ subroutine DrawFlow(lX,lY,averVel, boundaries)
     end do
     end do
     
-    ! Draw vector plot
+    ! Draw vector plot/ plshades
     u(:,:) = averVel(:,:,1)
     v(:,:) = averVel(:,:,2)
     u(:,1) = 0
@@ -57,13 +59,32 @@ subroutine DrawFlow(lX,lY,averVel, boundaries)
     u(:,lY) = 0
     v(:,lY) = 0
     maxAverVel = maxval(u)
-    scaling = 1.5/maxAverVel
-    if (maxAverVel .eq. 0d0) scaling=1
-    call plcol0(15)
-    write(title ,'(F10.5)') maxAverVel
-    call pllab('x', 'y', title)
-    call plcol0(9)
-    call plvect(u,v,scaling,xg,yg)
+    if (usePlShades .eqv. .false.) then
+         
+        scaling = 1.5/maxAverVel
+        if (maxAverVel .eq. 0d0) scaling=1
+        call plcol0(15)
+        write(title ,'(F10.5)') maxAverVel
+        call pllab('x', 'y', title)
+        call plcol0(9)
+        call plvect(u,v,scaling,xg,yg)
+    else
+        w(:,:) = sqrt( u(:,:)**2 + u(:,:)**2)
+        do i=0,numShades
+           shades(i)=(1.d0/dble(numShades-1))*(i-1)
+        end do
+        print *, shades
+        maxAverVel = maxval(w)
+        shades = shades*maxAverVel
+       ! print *, shades
+        print *, maxAverVel
+        !print *, (/1:11:1/)
+        !shades(1)= 0 = (/0d0,0.1d0,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0/))
+        
+        call plshades(w(:,:), dummy, xg(1,1), xg(lX,lY), yg(1,1), yg(lX,lY), shades, 1, 1, 0,xg,yg)
+
+    end if
+
     
     ! Output to screen
     call plflush()

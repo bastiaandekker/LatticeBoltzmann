@@ -4,28 +4,28 @@ clear all;
 fileName = 'profile.txt';
 
 
-%% Read data from file and store its contents
-data=importdata(fileName); 
-lY=size(data,1);
+%% Get data and fits
+[data9, fit9, y] = GetProfile('profile_Tau90.txt', 0.9, 0.00001); 
+[data8, fit8, y] = GetProfile('profile_Tau80.txt', 0.8, 0.00001); 
+[data7, fit7, y] = GetProfile('profile_Tau70.txt', 0.7, 0.00001); 
+[data6, fit6, y] = GetProfile('profile_Tau60.txt', 0.6, 0.00001); 
+%[dataE, fitE, y] = GetProfile('profile_Tau65.txt', 0.65, 0.0001); 
 
-%% Calculate fitting parabola
-tau = 8E-1;
-visc = (2*tau - 1)/6;
-deltaV = 0.0001;
-c = 1; %??
-curvature = c*deltaV/visc;
-y = -(lY-1)/2:(lY-1)/2;
-fit = -curvature*(y).^2 + curvature*(y(2)-1/2)^2; 
-
-%% Plot data
+%% Plot
 close all;
-plot(y, data(:), y, fit)
+p=plot(data9, y, 'g*', data8, y, 'm*', data7, y, 'r*',data6, y, 'b*', fit6, y, 'k')
 hold on;
+pfit= plot(fit9, y, 'k', fit8, y, 'k', fit7, y, 'k')
+%'b*',fit9, y, 'k')
+%hold on;
+%plot(dataE, y, 'r*',fitE, y, 'k')
 %ax = get(fig2,'CurrentAxes');
 %set(ax,'XScale','log','YScale','log')
-ylabel('v')%, 'FontSize',20);   % 'FontSize',20,'position',[-1.25,0.2]));
-xlabel('y')
-legend('LB simulation','parabola fit')
+xlabel('v ($\frac{\Delta x}{\Delta t}$)', 'interpreter', 'latex')%, 'FontSize',20);   % 'FontSize',20,'position',[-1.25,0.2]));
+ylabel('y ($\Delta x$)', 'interpreter', 'latex')
+legend([p], 'Simulation for $\tau=0.9$', 'Simulation for $\tau=0.8$', 'Simulation for $\tau=0.7$', 'Simulation for $\tau=0.6$','Theoretic solutions');
+h = legend;
+set(h, 'interpreter', 'latex')
 
 
 

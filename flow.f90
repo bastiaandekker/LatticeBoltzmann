@@ -11,6 +11,7 @@ program Flow
     ! Variables, see flow.params for the user-defined parameters
     integer                 :: lX, lY, timeSteps, t, numItPerFrame 
     logical                 :: useObstacle, pauzeAfterPlotting
+    logical                 :: usePlShades
     real(8)                 :: tau, deltaV
     
     real(8), allocatable    :: dens(:,:,:), newDens(:,:,:), eqDens(:,:,:)
@@ -31,12 +32,7 @@ program Flow
         call GetSumDensAndVel(sumDens, averVel, dens)
         call GetEqDens(eqDens, sumDens, averVel)
         call RelaxDensities(dens, tau, eqDens)
-!print *, averVel(3,15,:)
-!print *, sumDens(3,15)
-!print *, 'dens'
-!print *, dens(3,15,:)
-        call DoPlotting(t, pauzeAfterPlotting, averVel)
-        
+        call DoPlotting(t, pauzeAfterPlotting, averVel)  
     end do
     
     ! Save final results
@@ -47,7 +43,7 @@ contains
 subroutine Initialize
     ! Get parameter values from flow.params
     call GetParameters(lX, lY, tau, timeSteps, deltaV, useObstacle, &
-                         numItPerFrame, pauzeAfterPlotting)
+                         numItPerFrame, pauzeAfterPlotting, usePlShades)
     
     allocate(dens(lX,lY,numVel), newDens(lX,lY,numVel), eqDens(lX,lY,numVel), &
             sumDens(lX,lY), averVel(lX,lY,dimensions), boundaries(lX,lY))
@@ -123,8 +119,8 @@ subroutine ApplyForce(targetDens, deltaV)
     do x = 1, Lx
         do y = 1, Ly
             if (boundaries(x,y) .eqv. .false.) then
-                targetDens(x,y,2) = targetDens(x,y,2) + deltaV
-                targetDens(x,y,6) = targetDens(x,y,6) - deltaV
+                targetDens(x,y,2) = targetDens(x,y,2) + 0.5d0*deltaV
+                targetDens(x,y,6) = targetDens(x,y,6) - 0.5d0*deltaV
             end if
         end do
     end do
@@ -188,27 +184,31 @@ subroutine DoPlotting(t, pauzeAfterPlotting, averVel)
     if (mod(t, numItPerFrame).eq.0) then
         print *, '..................................'
         print *, t
-        call DrawFlow(lX,lY,averVel, boundaries)
+        call DrawFlow(lX,lY,averVel, boundaries, usePlShades)
         if (pauzeAfterPlotting) read(*, *)
     endif
 end subroutine DoPlotting
  
 ! **********************************************************************************
 subroutine PrintWriteResults(averVel)
-    real(8), intent(inout) :: averVel(:,:,:)
-    integer             :: i
+    real(8), intent(inout)  :: averVel(:,:,:)
+    integer                 :: i
+    character(40)           :: strFileName
     
     ! Close the PLplotting
     call ClosePlot()
     
     ! Save the average velocity profile at the entrence of the system
+    write(strFileName, '(a, a,I0, a)') &
+            'profile', '_Tau', int(tau*100),'.txt'
+    
     call GetSumDensAndVel(sumDens, averVel, dens)   
-    open(15, file='profile.txt')
+    open(15, file=strFileName)
     do i = 1, size(averVel(:,:,:), 2)
             write (15, *) averVel(1,i,1)
     end do
     close(15)
-    print *, 'Veloctity profile saved in profile.txt'
+    print *, 'Veloctity profile saved in ', strFileName
     write(*,*)
 end subroutine PrintWriteResults
 

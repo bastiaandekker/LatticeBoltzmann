@@ -1,8 +1,9 @@
-50          gridpoints in x-direction
-25          y-direction
-1000        timesteps
-8d-1        tau
-0.0001       deltaV
-.false.      Should an obstacle be placed in the pipe?
-10         Number of iterations in between the plotting    
-.false.      PauzeAfterPlotting
+2              gridpoints in x-direction
+50             y-direction
+100000            timesteps
+6.5d-1           tau
+0.0001          deltaV
+.false.         Should an obstacle be placed in the pipe?
+200              Number of iterations in between the plotting    
+.false.         PauzeAfterPlotting
+.false.         Should plshades be used
